@@ -15,9 +15,3 @@ clf.fit(boston['data'], boston['target'])
 
 #See how accurate our model is
 clf.score(boston['data'], boston['target'])
-
-
-# In[16]:
-
-
-get_ipython().run_line_magic('pinfo', 'clf.score')
