@@ -70,3 +70,15 @@ clf = SVR()
 clf.fit(Xs_train, ys_train)
 score = clf.score(Xs_test, ys_test)
 print(score)
+
+#Reduce dimensionality
+#PCA: principle component analysis
+#We're going to reduce our 13 features to 5
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components = 5)
+pca.fit(boston['data'])
+
+Xp = pca.transform(boston['data'])
+XpShape = Xp.shape
+print(XpShape)
