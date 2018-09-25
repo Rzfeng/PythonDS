@@ -1,5 +1,10 @@
 from sklearn.datasets import load_boston
 from sklearn.ensemble import RandomForestRegressor
+'''
+SVR Vs. Random Forest
+RF needs larger number of instances to work the randomization concept.
+If you have a small amount of data compared to possible variations of instances, then SVM is better
+'''
 
 boston = load_boston()
 boston.keys()
@@ -51,12 +56,17 @@ print("R^2 value: " + str(score))
 
 
 ##################Preprocess Data##################
+''' Need to preprocess data before feeding it into our model
+'''
 import pandas as pd
 from sklearn.svm import SVR
 from sklearn import preprocessing
 
 df = pd.DataFrame(boston['data'], columns = boston['feature_names'])
 df.max(axis=0)
+
+##Because NOX vs TAX has a huge difference, Random Forest Regression handles this, but
+##you can preprocess it using SVR
 
 clf = SVR()
 clf.fit(X_train, y_train)
@@ -66,6 +76,7 @@ Xs = preprocessing.scale(boston['data'])
 df2 = pd.DataFrame(Xs, columns = boston['feature_names'])
 Xs_train, Xs_test, ys_train, ys_test = train_test_split(Xs, boston['target'], test_size = 0.3)
 
+#
 clf = SVR()
 clf.fit(Xs_train, ys_train)
 score = clf.score(Xs_test, ys_test)
@@ -82,3 +93,57 @@ pca.fit(boston['data'])
 Xp = pca.transform(boston['data'])
 XpShape = Xp.shape
 print(XpShape)
+
+clf = RandomForestRegressor()
+Xp_train, Xp_test, yp_train, yp_test = train_test_split(Xp, boston['target'], test_size = 0.3)
+clf.fit(Xp_train, yp_train)
+print("_____After reducing demineions to _____")
+print(clf.score(Xp_test, yp_test))
+
+
+'''
+1.Initial preprocessing in Pandas
+2. load data into dataframe,
+3. Join values with another data source, fill missing values, etc
+4. Extract data as NumPy array using dataframe.values
+5. Use scikit learn'''
+
+
+
+
+################Data Pipelines################
+'''
+1. Scale Data
+2. Reduce number of dimensions
+3. Use SVR
+
+'''
+
+
+print("_____Using Data Pipelines_____")
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+pipe = Pipeline([
+    ('scale', StandardScaler()),
+    ('pca', PCA(n_components = 5)),
+    ('svr', SVR()),
+])
+
+pipe.fit(X_train, y_train)
+score = pipe.score(X_test, y_test)
+print(score)
+print("______Data Pipeline Steps______")
+print(pipe.steps)
+
+pipe.get_params()
+
+
+'''Storing and retrieving models (objects) '''
+import pickle
+with open('model.pickle', 'wb') as out:
+    pickle.dump(pipe, out)
+with open('model.pickle', 'rb') as fp:
+    pipe1 = pickle.load(fp)
+
+print(pipe1.steps)
